@@ -21,17 +21,7 @@ repositories {
     mavenCentral()
 }
 
-configurations {
-    provided
-}
-
-sourceSets {
-    main {
-        compileClasspath += configurations.provided
-    }
-}
-
 dependencies {
-    provided group: 'org.processing', name: 'core', version: '3.3.7'
+    compileOnly group: 'org.processing', name: 'core', version: '3.3.7'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
