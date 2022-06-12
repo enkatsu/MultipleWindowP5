@@ -4,6 +4,8 @@
 /gradle
 .DS_Store
 /.idea
+gradlew
+gradlew.bat
 
 # Created by .ignore support plugin (hsz.mobi)
 ### JetBrains template
