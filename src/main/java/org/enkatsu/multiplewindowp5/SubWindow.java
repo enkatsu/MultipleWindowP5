@@ -1,9 +1,9 @@
 package org.enkatsu.multiplewindowp5;
 
+import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
-
 import java.util.function.Consumer;
 
 
@@ -13,54 +13,57 @@ public class SubWindow extends PApplet {
     PApplet parent = null;
     int width = 256;
     int height = 256;
-    Runnable setupFunction = () -> {
-    };
-    Runnable drawFunction = () -> {
-    };
     MouseEventRunner mouseEventRunner;
     KeyEventRunner keyEventRunner;
+    Consumer<SubWindow> setupConsumer = self -> {};
+    Consumer<SubWindow> drawConsumer = self -> {};
 
-    public SubWindow(PApplet parent, int width, int height, Runnable setupFunction, Runnable drawFunction, String windowName) {
+    public SubWindow(PApplet parent, int width, int height) {
         super();
         this.parent = parent;
         this.width = width;
         this.height = height;
-        this.setupFunction = setupFunction;
-        this.drawFunction = drawFunction;
         this.mouseEventRunner = new MouseEventRunner(this);
         this.keyEventRunner = new KeyEventRunner(this);
-        this.windowName = windowName;
-        PApplet.runSketch(new String[]{this.windowName}, this);
-    }
-
-    public SubWindow(PApplet parent, int width, int height, Runnable setupFunction, Runnable drawFunction) {
-        this(
-                parent,
-                width, height,
-                setupFunction, drawFunction,
-                SubWindow.class.getName() + SubWindow.childWindowCount
-        );
         SubWindow.childWindowCount++;
+        this.windowName = SubWindow.class.getName() + SubWindow.childWindowCount;
     }
 
     public void settings() {
         size(width, height);
     }
 
-    public void setup() {
-        this.setupFunction.run();
+    public void setup(Consumer<SubWindow> setupConsumer) {
+        this.setupConsumer = setupConsumer;
+        PApplet.runSketch(new String[]{this.windowName}, this);
     }
 
+    @Override
+    public void setup() {
+        setupConsumer.accept(this);
+    }
+
+    public void draw(Consumer<SubWindow> drawConsumer) {
+         this.drawConsumer = drawConsumer;
+    }
+
+    @Override
     public void draw() {
-        this.drawFunction.run();
+        this.drawConsumer.accept(this);
     }
 
     public int getX() {
-        return this.frame.getX();
+        PSurfaceAWT.SmoothCanvas frame = (PSurfaceAWT.SmoothCanvas) this.surface.getNative();
+        return frame.getFrame().getX();
     }
 
     public int getY() {
-        return this.frame.getX();
+        PSurfaceAWT.SmoothCanvas frame = (PSurfaceAWT.SmoothCanvas) this.surface.getNative();
+        return frame.getFrame().getY();
+    }
+
+    public void setLocation(int x, int y) {
+        this.surface.setLocation(x, y);
     }
 
     // ********************
